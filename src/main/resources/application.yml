@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: installment-service
+  datasource:
+    # Local demo: in-memory H2. Switch to the 'postgres' profile for Postgres.
+    url: jdbc:h2:mem:installments;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
+  h2:
+    console:
+      enabled: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+app:
+  events:
+    # Set to true (and point spring.kafka.bootstrap-servers at a broker)
+    # to publish real Kafka events instead of logging them.
+    kafka-enabled: false
+
+---
+# Production-style profile: real Postgres ledger.
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/installments
+    driver-class-name: org.postgresql.Driver
+    username: installments
+    password: installments
+  jpa:
+    hibernate:
+      ddl-auto: validate
